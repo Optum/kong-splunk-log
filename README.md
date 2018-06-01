@@ -24,7 +24,7 @@ $ luarocks make *.rockspec
 ```
 
 ## Configuration
-The plugin requires an environment variable `SPLUNK_HOST` . This is how we define the host="" splunk field in the example log picture embedded in our README.
+The plugin requires an environment variable `SPLUNK_HOST` . This is how we define the host="" splunk field in the example log picture embedded above in our README.
 
 Example Plugin Configuration:
 

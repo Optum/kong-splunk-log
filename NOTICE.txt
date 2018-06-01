@@ -1,0 +1,24 @@
+Kong Plunk Log
+Copyright 2018 Optum
+
+Project Description:
+====================
+
+The Kong Splunk Log is a small, lua-based, OpenResty Nginx module which send HTP REST logs to Splunk based on Kong’s proxy requests. The purpose of this Splunk plugin is to maintain meta-data logs of all transactions.
+
+
+Authors:
+Ross Sbriscia, ©Optum 2018
+Jeremy Justus, ©Optum 2018
+
+Added Files:
+============
+
+
+
+
+
+
+
+Modified Files:
+===============

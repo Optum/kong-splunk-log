@@ -27,7 +27,7 @@ The plugin requires an environment variable `SPLUNK_HOST` . This is how we defin
 
 If not already set, it can be done so as follows:
 ```
-$ export SPLUNK_HOST="/path/to/kong/ssl/privatekey.key"
+$ export SPLUNK_HOST="gateway.company.com"
 ```
 
 **One last step** is to make the environment variable accessible by an nginx worker. To do this, simply add these line to your _nginx.conf_

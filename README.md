@@ -6,7 +6,7 @@ Kong provides many great logging tools out of the box, this is a modified versio
 
 Example Log Transaction:
 
-![alt text](https://github.com/Optum/kong-splunk-log/blob/master/SplunkLogSample.png)
+![Splunk Sample](https://github.com/Optum/kong-splunk-log/blob/master/SplunkLogSample.png)
 
 ## Supported Kong Releases
 Kong >= 0.12.x 
@@ -28,6 +28,7 @@ The plugin requires an environment variable `SPLUNK_HOST` . This is how we defin
 
 Example Plugin Configuration:
 
+![Splunk Config](https://github.com/Optum/kong-splunk-log/blob/master/SplunkConfig.png)
 
 If not already set, it can be done so as follows:
 ```

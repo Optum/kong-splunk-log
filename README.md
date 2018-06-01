@@ -2,7 +2,7 @@
 ## Overview
 Kong plugin designed to log API transactions to Splunk.
 
-Kong provides many great logging tools out of the box, this is an adapted version of the Kong HTTP logging plugin that has been refactored and tailored to work with Splunk.
+Kong provides many great logging tools out of the box, this is a modified version of the Kong HTTP logging plugin that has been refactored and tailored to work with Splunk.
 
 Example Log Transaction:
 

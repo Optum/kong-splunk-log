@@ -6,6 +6,7 @@ Kong provides many great logging tools out of the box, this is an adapted versio
 
 Example Log Transaction:
 
+![alt text](https://github.com/Optum/kong-splunk-log/blob/master/SplunkLogSample.png)
 
 ## Supported Kong Releases
 Kong >= 0.12.x 

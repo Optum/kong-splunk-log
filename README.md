@@ -40,4 +40,8 @@ $ export SPLUNK_HOST="gateway.company.com"
 env SPLUNK_HOST;
 ```
 
+## Maintainers
+@jeremyjpj0916
+@rsbrisci
+
 Feel free to open issues, or refer to our [Contribution Guidelines](https://github.com/Optum/kong-splunk-log/blob/master/CONTRIBUTING.md) if you have any questions.

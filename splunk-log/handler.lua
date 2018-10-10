@@ -1,4 +1,4 @@
-local basic_serializer = require "kong.plugins.kong-splunk-log.basic"
+local basic_serializer = require "kong.plugins.kong-splunk-log-stoneco.basic"
 local BasePlugin = require "kong.plugins.base_plugin"
 local cjson = require "cjson"
 local url = require "socket.url"

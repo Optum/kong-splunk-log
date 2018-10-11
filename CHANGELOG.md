@@ -5,6 +5,7 @@ All changes made on any release of this project should be commented on high leve
 Document model based on [Semantic Versioning](http://semver.org/).
 Examples of how to use this _markdown_ cand be found here [Keep a CHANGELOG](http://keepachangelog.com/).
 
-## Unreleased
+## [0.1.2](https://github.com/stone-payments/kong-splunk-log/tree/v0.1.2) - 2018-10-11
 ### Changed
 - Package name
+- Log format to Kong default format.

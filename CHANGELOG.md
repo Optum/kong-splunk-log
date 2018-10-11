@@ -9,3 +9,4 @@ Examples of how to use this _markdown_ cand be found here [Keep a CHANGELOG](htt
 ### Changed
 - Package name
 - Log format to Kong default format.
+- Versioning format.

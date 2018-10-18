@@ -18,13 +18,6 @@ function _M.serialize(ngx)
   end
 
   local serviceName
-  --Deprecated API Resource (Kong < 0.13.0)
-  if ngx.ctx.api ~= nil then
-    if ngx.ctx.api.name ~= nil then 
-        serviceName = ngx.ctx.api.name
-    end
-  end
-	
   --Service Resource (Kong >= 0.13.0)
   if ngx.ctx.service ~= nil then
     if ngx.ctx.service.name ~= nil then
@@ -36,6 +29,7 @@ function _M.serialize(ngx)
   	host=splunkHost,
   	source=ngx.var.hostname,
   	sourcetype="AccessLog",
+	time = ngx.time(),
   	event={   
 	          CID = ngx.req.get_headers()["optum-cid-ext"],
 		  HTTPMethod = ngx.req.get_method(),

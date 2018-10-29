@@ -5,7 +5,7 @@ return {
     content_type = { default = "application/json", enum = { "application/json" } },
     timeout = { default = 10000, type = "number" },
     keepalive = { default = 60000, type = "number" },
-    splunk_access_token = { default = "aaaaaaaa-bbbb-cccc-dddd-ffffffffffff", type="text"},
+    splunk_access_token = { default = "aaaaaaaa-bbbb-cccc-dddd-ffffffffffff", type="string"},
     retry_count = { default = 5, type = "number" },
     queue_size = { default = 20, type = "number" },
     flush_timeout = { default = 30, type = "number" }

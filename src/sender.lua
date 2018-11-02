@@ -74,14 +74,14 @@ local function send(self, bodies)
     })
     if not res then
       log(ERR, "failed request to ", host, ":", tostring(port), ": ", err)
-    end
-    
-    -- read and discard body
-    -- TODO should we fail if response status was >= 500 ?
-    res:read_body()
-    
-    if res.status ~= 200 then
-       log(ERR, "Error: Splunk returned status code: ",  tostring(res.status))
+      return false
+    else
+      -- read and discard body
+      -- TODO should we fail if response status was >= 500 ?
+      res:read_body()
+      if res.status ~= 200 then
+         log(ERR, "Error: Splunk returned status code: ",  tostring(res.status))
+      end      
     end
 
     ok, err = httpc:set_keepalive(self.keepalive)

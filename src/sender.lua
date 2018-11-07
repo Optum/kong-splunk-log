@@ -74,6 +74,7 @@ local function send(self, bodies)
     })
     if not res then
       log(ERR, "failed request to ", host, ":", tostring(port), ": ", err)
+      httpc:set_keepalive(self.keepalive)
       return false
     else
       -- read and discard body

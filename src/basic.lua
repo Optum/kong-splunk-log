@@ -25,6 +25,11 @@ function _M.serialize(ngx)
     end
   end
 
+  local errMsg
+  if kong.ctx.shared.errmsg ~= nil then
+    errMsg = kong.ctx.shared.errmsg
+  end
+
   return {
   	host=splunkHost,
   	source=ngx.var.hostname,
@@ -36,6 +41,7 @@ function _M.serialize(ngx)
 		  RequestSize = ngx.var.request_length,
 		  RoutingURL = RouteUrl,
 		  HTTPStatus = ngx.status,
+                  ErrorMsg = errMsg,
 		  GatewayHost = ngx.var.host,
                   Tries = (ngx.ctx.balancer_address or EMPTY).tries, --contains the list of (re)tries (successes and failures) made by the load balancer for this request
 		  ResponseSize = ngx.var.bytes_sent,

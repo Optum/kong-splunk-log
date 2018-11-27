@@ -20,14 +20,7 @@ function _M.serialize(ngx)
   local serviceName
   --Service Resource (Kong >= 0.13.0)
   if ngx.ctx.service ~= nil then
-    if ngx.ctx.service.name ~= nil then
         serviceName = ngx.ctx.service.name
-    end
-  end
-
-  local errMsg
-  if kong.ctx.shared.errmsg ~= nil then
-    errMsg = kong.ctx.shared.errmsg
   end
 
   return {
@@ -41,7 +34,7 @@ function _M.serialize(ngx)
 		  RequestSize = ngx.var.request_length,
 		  RoutingURL = RouteUrl,
 		  HTTPStatus = ngx.status,
-                  ErrorMsg = errMsg,
+                  ErrorMsg = kong.ctx.shared.errmsg,
 		  GatewayHost = ngx.var.host,
                   Tries = (ngx.ctx.balancer_address or EMPTY).tries, --contains the list of (re)tries (successes and failures) made by the load balancer for this request
 		  ResponseSize = ngx.var.bytes_sent,

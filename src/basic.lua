@@ -26,8 +26,8 @@ function _M.serialize(ngx)
   end
 
   local errMsg
-  if ngx.ctx.errmsg ~= nil then
-    errMsg = ngx.ctx.errmsg
+  if kong.ctx.shared.errmsg ~= nil then
+    errMsg = kong.ctx.shared.errmsg
   end
 
   return {

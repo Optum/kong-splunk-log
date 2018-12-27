@@ -13,7 +13,7 @@ local ERR = ngx.ERR
 local KongSplunkLog = BasePlugin:extend()
 
 KongSplunkLog.PRIORITY = 12
-KongSplunkLog.VERSION = "0.1.5"
+KongSplunkLog.VERSION = "0.2.0"
 
 
 local buffers = {} -- buffers per-route / -api

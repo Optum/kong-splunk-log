@@ -13,8 +13,8 @@ function _M.serialize(ngx)
   end
 
   local RouteUrl
-  if ngx.ctx.balancer_address ~= nil then 
-      RouteUrl = ngx.ctx.balancer_address.host .. ":" .. ngx.ctx.balancer_address.port .. string.gsub(ngx.var.upstream_uri,"%?.*","")
+  if ngx.ctx.balancer_data ~= nil then 
+      RouteUrl = ngx.ctx.balancer_data.host .. ":" .. ngx.ctx.balancer_data.port .. string.gsub(ngx.var.upstream_uri,"%?.*","")
   end
 
   local serviceName
@@ -36,7 +36,7 @@ function _M.serialize(ngx)
 		  HTTPStatus = ngx.status,
                   ErrorMsg = kong.ctx.shared.errmsg,
 		  GatewayHost = ngx.var.host,
-                  Tries = (ngx.ctx.balancer_address or EMPTY).tries, --contains the list of (re)tries (successes and failures) made by the load balancer for this request
+                  Tries = (ngx.ctx.balancer_data or EMPTY).tries, --contains the list of (re)tries (successes and failures) made by the load balancer for this request
 		  ResponseSize = ngx.var.bytes_sent,
 		  BackendLatency = ngx.ctx.KONG_WAITING_TIME or -1, -- is the time it took for the final service to process the request
 		  TotalLatency = ngx.var.request_time * 1000, --  is the time elapsed between the first bytes were read from the client and after the last bytes were sent to the client. Useful for detecting slow clients

@@ -1,5 +1,5 @@
 package = "kong-splunk-log"
-version = "0.1-9"
+version = "0.2-0"
 source = {
    url = "git+https://github.com/Optum/kong-splunk-log.git"
 }

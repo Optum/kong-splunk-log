@@ -9,7 +9,7 @@ Example Event Log Transaction:
 ![Splunk Sample](https://github.com/Optum/kong-splunk-log/blob/master/SplunkLogSample.png)
 
 ## Supported Kong Releases
-Kong >= 0.13.x 
+Kong >= 1.x 
 
 ## Installation
 Recommended:

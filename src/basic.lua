@@ -1,7 +1,5 @@
 local tablex = require "pl.tablex"
 local _M = {}
-local singletons = require "kong.singletons"
-local pl_file = require "pl.file"
 local EMPTY = tablex.readonly({})
 local splunkHost= os.getenv("SPLUNK_HOST")
 

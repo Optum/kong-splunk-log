@@ -3,6 +3,8 @@ local http = require "resty.http"
 local sender = {}
 local ngx_encode_base64 = ngx.encode_base64
 local ERR = ngx.ERR
+local sub = string.sub
+local gsub = string.gsub
 
 -- Parse host url.
 -- @param `url` host url
@@ -39,8 +41,8 @@ local function send(self, bodies)
   
     --Convert to splunk batch format is queue_size > 1
     if self.queue_size > 1 then
-      body = string.sub(body, 2,-2)
-      body = body:gsub("},{\"host\"","}\n\n{\"host\"")
+      body = sub(body, 2,-2)
+      body = gsub(body, "},{\"host\"", "}\n\n{\"host\"")
     end
   
     local httpc = http.new()
@@ -76,14 +78,14 @@ local function send(self, bodies)
       log(ERR, "failed request to ", host, ":", tostring(port), ": ", err)
       httpc:set_keepalive(self.keepalive)
       return false
-    else
-      -- read and discard body
-      -- TODO should we fail if response status was >= 500 ?
-      res:read_body()
-      if res.status ~= 200 then
-         log(ERR, "Error: Splunk returned status code: ",  tostring(res.status))
-      end      
     end
+    
+    -- read and discard body
+    -- TODO should we fail if response status was >= 500 ?
+    res:read_body()
+    if res.status ~= 200 then
+       log(ERR, "Error: Splunk returned status code: ",  tostring(res.status))
+    end      
 
     ok, err = httpc:set_keepalive(self.keepalive)
     if not ok then

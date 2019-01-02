@@ -44,13 +44,8 @@ end
 
 function KongSplunkLog:log(conf)
   KongSplunkLog.super.log(self)
-
-  local route_id 
-  if ngx.ctx.route then
-    route_id = ngx.ctx.route.id
-  else
-    route_id = "notfound" 
-  end
+  
+  local route_id = conf.route_id or "global"
   
   local buf = buffers[route_id]
   if not buf then

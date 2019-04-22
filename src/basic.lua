@@ -9,10 +9,15 @@ function _M.serialize(ngx)
   if ngx.ctx.authenticated_consumer ~= nil then
     ConsumerUsername = ngx.ctx.authenticated_consumer.username
   end
+	
+  local PathOnly
+  if ngx.var.request_uri ~= nil then
+      PathOnly = string.gsub(ngx.var.upstream_uri,"%?.*","")
+  end
 
   local RouteUrl
   if ngx.ctx.balancer_data ~= nil then 
-      RouteUrl = ngx.ctx.balancer_data.host .. ":" .. ngx.ctx.balancer_data.port .. string.gsub(ngx.var.upstream_uri,"%?.*","")
+      RouteUrl = ngx.ctx.balancer_data.host .. ":" .. ngx.ctx.balancer_data.port .. PathOnly
   end
 
   local serviceName
@@ -38,9 +43,15 @@ function _M.serialize(ngx)
 		  ResponseSize = ngx.var.bytes_sent,
 		  BackendLatency = ngx.ctx.KONG_WAITING_TIME or -1, -- is the time it took for the final service to process the request
 		  TotalLatency = ngx.var.request_time * 1000, --  is the time elapsed between the first bytes were read from the client and after the last bytes were sent to the client. Useful for detecting slow clients
-                  Consumer = ConsumerUsername,
+                  KongLatency = {
+                    AccessTime = (ngx.ctx.KONG_ACCESS_TIME or 0),     --Access phase, majority of Kong plugins
+                    ReceiveTime = (ngx.ctx.KONG_RECEIVE_TIME or 0),   --Time it took before Kong had fully recieved all headers and response body from backend
+                    RewriteTime = (ngx.ctx.KONG_REWRITE_TIME or 0),   --Rewrite phase (between Kong has response and time spent before returning it to client)
+                    BalancerTime = (ngx.ctx.KONG_BALANCER_TIME or 0)  --Balancer time, DNS or upstream/target logic Kong hot paths here
+                  },
+		  Consumer = ConsumerUsername,
 		  ClientIP = ngx.var.remote_addr,
-		  URI = string.gsub(ngx.var.request_uri,"%?.*",""),
+		  URI = PathOnly,
 		  ServiceName = serviceName,
 	      }
   }

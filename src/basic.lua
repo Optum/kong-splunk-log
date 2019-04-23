@@ -12,12 +12,17 @@ function _M.serialize(ngx)
 	
   local PathOnly
   if ngx.var.request_uri ~= nil then
-      PathOnly = string.gsub(ngx.var.upstream_uri,"%?.*","")
+      PathOnly = string.gsub(ngx.var.request_uri,"%?.*","")
+  end
+	
+  local UpstreamPathOnly
+  if ngx.var.upstream_uri ~= nil then
+      UpstreamPathOnly = string.gsub(ngx.var.upstream_uri,"%?.*","")
   end
 
   local RouteUrl
   if ngx.ctx.balancer_data ~= nil then 
-      RouteUrl = ngx.ctx.balancer_data.host .. ":" .. ngx.ctx.balancer_data.port .. PathOnly
+      RouteUrl = ngx.ctx.balancer_data.host .. ":" .. ngx.ctx.balancer_data.port .. UpstreamPathOnly
   end
 
   local serviceName

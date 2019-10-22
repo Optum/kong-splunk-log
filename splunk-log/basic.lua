@@ -1,23 +1,41 @@
 local tablex = require "pl.tablex"
-local splunkHost = os.getenv("SPLUNK_HOST")
-
 local _M = {}
-
 local EMPTY = tablex.readonly({})
+local splunkHost= os.getenv("SPLUNK_HOST")
 
 function _M.serialize(ngx)
-  local authenticated_entity
-  if ngx.ctx.authenticated_credential ~= nil then
-    authenticated_entity = {
-      id = ngx.ctx.authenticated_credential.id,
-      consumer_id = ngx.ctx.authenticated_credential.consumer_id
-    }
+  -- Handles Nil Users
+  local ConsumerUsername
+  if ngx.ctx.authenticated_consumer ~= nil then
+    ConsumerUsername = ngx.ctx.authenticated_consumer.username
+  end
+
+  local PathOnly
+  if ngx.var.request_uri ~= nil then
+      PathOnly = string.gsub(ngx.var.request_uri,"%?.*","")
+  end
+
+  local UpstreamPathOnly
+  if ngx.var.upstream_uri ~= nil then
+      UpstreamPathOnly = string.gsub(ngx.var.upstream_uri,"%?.*","")
+  end
+
+  local RouteUrl
+  if ngx.ctx.balancer_data ~= nil then
+      RouteUrl = ngx.ctx.balancer_data.host .. ":" .. ngx.ctx.balancer_data.port .. UpstreamPathOnly
+  end
+
+  local serviceName
+  --Service Resource (Kong >= 0.13.0)
+  if ngx.ctx.service ~= nil then
+        serviceName = ngx.ctx.service.name
   end
 
   return {
-    host = splunkHost,
-    source = ngx.var.hostname,
-    sourcetype = "AccessLog",
+  	host = splunkHost,
+  	source = ngx.var.hostname,
+  	sourcetype = "AccessLog",
+	  time = ngx.time(),
     event = {
       request = {
         uri = ngx.var.request_uri,
@@ -48,7 +66,6 @@ function _M.serialize(ngx)
       client_ip = ngx.var.remote_addr,
       started_at = ngx.req.start_time() * 1000
     }
-  }
 end
 
 return _M

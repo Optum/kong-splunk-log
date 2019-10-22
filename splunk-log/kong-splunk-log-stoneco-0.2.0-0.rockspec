@@ -1,5 +1,5 @@
 package = "kong-splunk-log-stoneco"
-version = "0.1.0-0"
+version = "0.2.0-0"
 source = {
    url = "git+https://github.com/Optum/kong-splunk-log.git"
 }
@@ -16,8 +16,12 @@ dependencies = {}
 build = {
    type = "builtin",
    modules = {
-      ["kong.plugins.kong-splunk-log-stoneco.basic"] = "./basic.lua",
-      ["kong.plugins.kong-splunk-log-stoneco.handler"]  = "./handler.lua",
-      ["kong.plugins.kong-splunk-log-stoneco.schema"]= "./schema.lua"
+      ["kong.plugins.kong-splunk-log.buffer"] = "src/buffer.lua",
+      ["kong.plugins.kong-splunk-log.json_producer"] = "src/json_producer.lua",
+      ["kong.plugins.kong-splunk-log.lua_producer"] = "src/lua_producer.lua",
+      ["kong.plugins.kong-splunk-log.sender"] = "src/sender.lua",
+      ["kong.plugins.kong-splunk-log.basic"] = "src/basic.lua",
+      ["kong.plugins.kong-splunk-log.handler"]  = "src/handler.lua",
+      ["kong.plugins.kong-splunk-log.schema"]= "src/schema.lua"
    }
 }

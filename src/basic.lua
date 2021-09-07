@@ -58,7 +58,7 @@ function _M.serialize(ngx, kong)
           BackendLatency = ctx.KONG_WAITING_TIME or -1, -- is the time it took for the final service to process the request
           TotalLatency = var.request_time * 1000, --  is the time elapsed between the first bytes were read from the client and after the last bytes were sent to the client. Useful for detecting slow clients
           KongLatency = (ctx.KONG_PROXY_LATENCY or ctx.KONG_RESPONSE_LATENCY or 0) + (ctx.KONG_RECEIVE_TIME or 0), -- is the internal Kong latency that it took to run all the plugins
-          StartedAt = ctx.KONG_PROCESSING_START or (req.start_time() * 1000) -- Contains the UTC timestamp of when the request had started to be processed.
+          StartedAt = ctx.KONG_PROCESSING_START or (req.start_time() * 1000), -- Contains the UTC timestamp of when the request had started to be processed.
           Consumer = ConsumerUsername,
           ClientIP = var.remote_addr,
           URI = PathOnly,

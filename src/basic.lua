@@ -29,9 +29,19 @@ function _M.serialize(ngx, kong)
       UpstreamPathOnly = string.gsub(var.upstream_uri,"%?.*","")
   end
 
-  local RouteUrl
-  if ctx.balancer_data ~= nil then 
-      RouteUrl = ctx.balancer_data.host .. ":" .. ctx.balancer_data.port .. UpstreamPathOnly
+  local RouteUrl = ""
+  if ctx.balancer_data ~= nil then
+      if ctx.balancer_data.host ~= nil then
+        RouteUrl = ctx.balancer_data.host
+      end
+
+      if ctx.balancer_data.port ~= nil then
+        RouteUrl = RouteUrl .. ":" .. ctx.balancer_data.port
+      end
+
+      if UpstreamPathOnly ~= nil then
+        RouteUrl = RouteUrl .. UpstreamPathOnly
+      end
   end
 
   local serviceName

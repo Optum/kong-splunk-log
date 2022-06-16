@@ -45,9 +45,27 @@ function _M.serialize(ngx, kong)
   end
 
   local serviceName
+  local appId
   --Service Resource (Kong >= 0.13.0)
   if ctx.service ~= nil then
-        serviceName = ctx.service.name
+    serviceName = ctx.service.name
+
+    if ctx.service.tags ~= nil then
+      --Find app id tag. Tags are like: [key:value, key:value]
+      for _, tag in ipairs(ctx.service.tags) do
+        local values = {}
+        local index = 0
+        for token in string.gmatch(tag, "[^:]+") do
+          values[index] = token
+          index = index + 1
+        end
+
+        if (index == 2 and values[0] == "appId") then
+          appId = values[1]
+          break
+        end
+      end
+    end
   end
 
   return {
@@ -57,6 +75,7 @@ function _M.serialize(ngx, kong)
       time = req.start_time(), -- Contains the UTC timestamp of when the request has started to be processed. No rounding like StartedAt + lacks ctx.KONG_PROCESSING_START as possible return(look for discrepancies maybe sometime?).
       event = {   
           CID = req.get_headers()["optum-cid-ext"],
+          FrontDoorRef = req.get_headers()["X-Azure-Ref"],
           HTTPMethod = kong.request.get_method(),
           RequestSize = var.request_length,
           RoutingURL = RouteUrl,
@@ -75,6 +94,7 @@ function _M.serialize(ngx, kong)
           ServiceName = serviceName,
           GatewayPort = ((var.server_port == "8443" or var.server_port == "8000") and "443" or "8443"),
           ClientCertEnd = var.ssl_client_v_end,
+          AppId = appId,
       }
   }
 end

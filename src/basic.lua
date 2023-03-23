@@ -74,7 +74,7 @@ function _M.serialize(ngx, kong)
       sourcetype = "AccessLog",
       time = req.start_time(), -- Contains the UTC timestamp of when the request has started to be processed. No rounding like StartedAt + lacks ctx.KONG_PROCESSING_START as possible return(look for discrepancies maybe sometime?).
       event = {   
-          CID = req.get_headers()["optum-cid-ext"],
+          CID = req.get_headers()["optum-cid-ext"] or kong.service.request.get_header("optum-cid-ext"),
           FrontDoorRef = req.get_headers()["X-Azure-Ref"],
           HTTPMethod = kong.request.get_method(),
           RequestSize = var.request_length,

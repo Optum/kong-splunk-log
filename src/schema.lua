@@ -14,9 +14,10 @@ return {
           { content_type = { type = "string", default = "application/json", one_of = { "application/json" }, }, },
           { timeout = { type = "number", default = 10000 }, },
           { keepalive = { type = "number", default = 60000 }, },
-          { retry_count = { type = "integer", default = 10 }, },
-          { queue_size = { type = "integer", default = 1 }, },
-          { flush_timeout = { type = "number", default = 2 }, },
+          { retry_count = { type = "integer" }, },
+          { queue_size = { type = "integer" }, },
+          { flush_timeout = { type = "number" }, },
+          { queue = typedefs.queue },
     }, }, },
   },
 }

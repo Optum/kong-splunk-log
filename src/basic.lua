@@ -31,7 +31,9 @@ function _M.serialize(ngx, kong)
 
   local RouteUrl = ""
   if ctx.balancer_data ~= nil then
-      if ctx.balancer_data.host ~= nil then
+      if var.upstream_host ~= nil and var.upstream_host ~= '' then
+        RouteUrl = var.upstream_host
+      elseif ctx.balancer_data.host ~= nil then
         RouteUrl = ctx.balancer_data.host
       end
 

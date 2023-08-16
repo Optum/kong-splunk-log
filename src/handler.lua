@@ -1,28 +1,58 @@
 local basic_serializer = require "kong.plugins.kong-splunk-log.basic"
-local BatchQueue = require "kong.tools.batch_queue"
+local Queue = require "kong.tools.queue"
 local cjson = require "cjson"
 local url = require "socket.url"
 local http = require "resty.http"
-
-
 local cjson_encode = cjson.encode
 local ngx_encode_base64 = ngx.encode_base64
 local table_concat = table.concat
+local tostring = tostring
+local tonumber = tonumber
 local fmt = string.format
-
+local pairs = pairs
+local max = math.max
 
 local KongSplunkLog = {}
 
-
 KongSplunkLog.PRIORITY = 12
-KongSplunkLog.VERSION = "3.8.0"
+KongSplunkLog.VERSION = "3.9.0"
 
+-- Create a function that concatenates multiple JSON objects into a JSON array.
+-- This saves us from rendering all entries into one large JSON string.
+-- Each invocation of the function returns the next bit of JSON, i.e. the opening
+-- bracket, the entries, delimiting commas and the closing bracket.
+-- UPDATE: Edited to not have leading/trailing []'s and no commas between entries for splunk format logging.
+local function make_splunk_json_array_payload_function(conf, entries)
+  if conf.queue.max_batch_size == 1 then
+    return #entries[1], entries[1]
+  end
 
-local queues = {} -- one queue per unique plugin config
+  local nentries = #entries
+
+  local content_length = 1
+  for i = 1, nentries do
+    content_length = content_length + #entries[i] + 1
+  end
+
+  local i = 0
+  local last = max(2, nentries * 2 + 1)
+  return content_length, function()
+    i = i + 1
+
+    if i == 1 then
+      return ''
+
+    elseif i < last then
+      return i % 2 == 0 and entries[i / 2] or '\n\n'
+
+    elseif i == last then
+      return ''
+    end
+  end
+end
+
 
 local parsed_urls_cache = {}
-
-
 -- Parse host url.
 -- @param `url` host url
 -- @return `parsed_url` a table with host details:
@@ -38,6 +68,7 @@ local function parse_url(host_url)
   if not parsed_url.port then
     if parsed_url.scheme == "http" then
       parsed_url.port = 80
+
     elseif parsed_url.scheme == "https" then
       parsed_url.port = 443
     end
@@ -55,7 +86,7 @@ end
 -- Sends the provided payload (a string) to the configured plugin host
 -- @return true if everything was sent correctly, falsy if error
 -- @return error message if there was an error
-local function send_payload(self, conf, payload)
+local function send_payload(conf, entries)
   local method = conf.method
   local timeout = conf.timeout
   local keepalive = conf.keepalive
@@ -82,7 +113,9 @@ local function send_payload(self, conf, payload)
                   host .. ":" .. tostring(port) .. ": " .. err
     end
   end
-
+  
+  local content_length, payload = make_splunk_json_array_payload_function(conf, entries)
+  
   local res, err = httpc:request({
     method = method,
     path = parsed_url.path,
@@ -90,7 +123,7 @@ local function send_payload(self, conf, payload)
     headers = {
       ["Host"] = parsed_url.host,
       ["Content-Type"] = content_type,
-      ["Content-Length"] = #payload,
+      ["Content-Length"] = content_length,
       ["Authorization"] = "Splunk " .. splunk_token,
     },
     body = payload,
@@ -120,59 +153,39 @@ local function send_payload(self, conf, payload)
   return success, err_msg
 end
 
-
-local function json_array_concat(entries)
-  --return "[" .. table_concat(entries, ",") .. "]" If splunk followed true json format we would use this
-    return "" .. table_concat(entries, "\n\n") .. "" -- Break events up by newlining them
-end
-
-
-local function get_queue_id(conf)
+-- Create a queue name from the same legacy parameters that were used in the
+-- previous queue implementation.  This ensures that http-log instances that
+-- have the same log server parameters are sharing a queue.  It deliberately
+-- uses the legacy parameters to determine the queue name, even though they may
+-- be nil in newer configurations.  Note that the modernized queue related
+-- parameters are not included in the queue name determination.
+local function make_queue_name(conf)
   return fmt("%s:%s:%s:%s:%s:%s",
-             conf.splunk_endpoint,
-             conf.method,
-             conf.content_type,
-             conf.timeout,
-             conf.keepalive,
-             conf.retry_count,
-             conf.queue_size,
-             conf.flush_timeout)
+    conf.splunk_endpoint,
+    conf.method,
+    conf.content_type,
+    conf.timeout,
+    conf.keepalive,
+    conf.retry_count,
+    conf.queue_size,
+    conf.flush_timeout)
 end
 
 
 function KongSplunkLog:log(conf)
-  local entry = cjson_encode(basic_serializer.serialize(ngx))
 
-  local queue_id = get_queue_id(conf)
-  local q = queues[queue_id]
-  if not q then
-    -- batch_max_size <==> conf.queue_size
-    local batch_max_size = conf.queue_size or 1
-    local process = function(entries)
-      local payload = batch_max_size == 1
-                      and entries[1]
-                      or  json_array_concat(entries)
-  
-      return send_payload(self, conf, payload)
-    end
+  local queue_conf = Queue.get_plugin_params("kong-splunk-log", conf, make_queue_name(conf))
+  kong.log.debug("Queue name automatically configured based on configuration parameters to: ", queue_conf.name)
 
-    local opts = {
-      retry_count    = conf.retry_count,
-      flush_timeout  = conf.flush_timeout,
-      batch_max_size = batch_max_size,
-      process_delay  = 0,
-    }
-
-    local err
-    q, err = BatchQueue.new(process, opts)
-    if not q then
-      kong.log.err("could not create queue: ", err)
-      return
-    end
-    queues[queue_id] = q
+  local ok, err = Queue.enqueue(
+    queue_conf,
+    send_payload,
+    conf,
+    cjson_encode(basic_serializer.serialize(ngx))
+  )
+  if not ok then
+    kong.log.err("Failed to enqueue log entry to log server: ", err)
   end
-
-  q:add(entry)
 end
 
 return KongSplunkLog

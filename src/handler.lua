@@ -15,7 +15,7 @@ local max = math.max
 local KongSplunkLog = {}
 
 KongSplunkLog.PRIORITY = 12
-KongSplunkLog.VERSION = "3.8.0"
+KongSplunkLog.VERSION = "3.9.0"
 
 -- Create a function that concatenates multiple JSON objects into a JSON array.
 -- This saves us from rendering all entries into one large JSON string.

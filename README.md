@@ -1,4 +1,14 @@
 # Kong Splunk Log
+
+## :warning: Notice :warning:
+
+
+
+<b>We have decided to update this plugin one last time for Kong 3.7 compatibility. But going forward this repo/plugin will no longer be maintained. In the future we recommend using a modified http-log plugin paired with
+a modified Kong pdk log serializer patch file going forward.</b>
+
+See https://docs.konghq.com/hub/kong-inc/http-log/how-to/splunk/ for more information
+
 ## Overview
 Kong plugin designed to log API transactions to Splunk using the Splunk HTTP collector.
 

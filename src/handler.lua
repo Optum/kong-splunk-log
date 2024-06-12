@@ -17,6 +17,11 @@ local KongSplunkLog = {}
 KongSplunkLog.PRIORITY = 12
 KongSplunkLog.VERSION = "3.9.0"
 
+local function json_array_concat(entries)
+  --return "[" .. table_concat(entries, ",") .. "]" If splunk followed true json format we would use this
+    return "" .. table_concat(entries, "\n\n") .. "" -- Break events up by newlining them
+end
+
 -- Create a function that concatenates multiple JSON objects into a JSON array.
 -- This saves us from rendering all entries into one large JSON string.
 -- Each invocation of the function returns the next bit of JSON, i.e. the opening
@@ -25,29 +30,9 @@ KongSplunkLog.VERSION = "3.9.0"
 local function make_splunk_json_array_payload_function(conf, entries)
   if conf.queue.max_batch_size == 1 then
     return #entries[1], entries[1]
-  end
-
-  local nentries = #entries
-
-  local content_length = 1
-  for i = 1, nentries do
-    content_length = content_length + #entries[i] + 1
-  end
-
-  local i = 0
-  local last = max(2, nentries * 2 + 1)
-  return content_length, function()
-    i = i + 1
-
-    if i == 1 then
-      return ''
-
-    elseif i < last then
-      return i % 2 == 0 and entries[i / 2] or '\n\n'
-
-    elseif i == last then
-      return ''
-    end
+  else
+    local payload = json_array_concat(entries)
+    return #payload, payload
   end
 end
 
@@ -113,9 +98,9 @@ local function send_payload(conf, entries)
                   host .. ":" .. tostring(port) .. ": " .. err
     end
   end
-  
+
   local content_length, payload = make_splunk_json_array_payload_function(conf, entries)
-  
+
   local res, err = httpc:request({
     method = method,
     path = parsed_url.path,

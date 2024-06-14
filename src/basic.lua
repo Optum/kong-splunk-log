@@ -78,6 +78,7 @@ function _M.serialize(ngx, kong)
       event = {   
           CID = kong.request.get_header("optum-cid-ext"),
           FrontDoorRef = req.get_headers()["X-Azure-Ref"],
+          TraceId = req.get_headers()["X-Appgw-Trace-Id"],
           HTTPMethod = kong.request.get_method(),
           RequestSize = var.request_length,
           RoutingURL = RouteUrl,
